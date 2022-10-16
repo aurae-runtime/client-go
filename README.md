@@ -17,7 +17,7 @@ tlsConfig := &tls.Config{} // Provide your TLS configuration
 
 client, err := aurae.NewClient("localhost:8080", credentials.NewTLS(tlsConfig))
 if err != nil {
-    panic(err)
+panic(err)
 }
 ```
 
@@ -25,12 +25,13 @@ if err != nil {
 
 ```go
 exec := &runtime.Executable{
-    Command: "echo $USER",
-    Comment: "echo-user",
+    Command: "tail -f /dev/null",
+    Comment: "my-executable",
 }
-	
-_, err := client.Runtime().ExecutableStart(context.TODO(), exec)
+status, err := client.Runtime().ExecutableStart(context.TODO(), exec)
 if err != nil {
     panic(err)
 }
+
+fmt.Printf("Executable running with pid %d\n", status.Proc.Pid)
 ```
