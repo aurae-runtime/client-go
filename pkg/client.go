@@ -1,9 +1,9 @@
-package aurae
+package pkg
 
 import (
+	"github.com/aurae-runtime/client-go/pkg/api/v0/schedule"
 	"github.com/aurae-runtime/client-go/pkg/observe"
 	"github.com/aurae-runtime/client-go/pkg/runtime"
-	"github.com/aurae-runtime/client-go/pkg/stdlib/v0/schedule"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

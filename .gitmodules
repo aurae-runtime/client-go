@@ -1,4 +1,4 @@
-[submodule "auraed"]
-	path = auraed
-	url = https://github.com/aurae-runtime/auraed
+[submodule "aurae"]
+	path = aurae
+	url = https://github.com/aurae-runtime/aurae
 	branch = main

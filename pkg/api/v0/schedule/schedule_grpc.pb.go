@@ -4,7 +4,7 @@ package schedule
 
 import (
 	context "context"
-	runtime "github.com/aurae-runtime/client-go/pkg/stdlib/v0/runtime"
+	runtime "github.com/aurae-runtime/client-go/pkg/api/v0/runtime"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

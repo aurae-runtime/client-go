@@ -2,7 +2,7 @@ package observe
 
 import (
 	"context"
-	"github.com/aurae-runtime/client-go/pkg/stdlib/v0/observe"
+	"github.com/aurae-runtime/client-go/pkg/api/v0/observe"
 	"google.golang.org/grpc"
 )
 
