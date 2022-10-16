@@ -28,7 +28,7 @@ exec := &runtime.Executable{
     Command: "tail -f /dev/null",
     Comment: "my-executable",
 }
-status, err := client.Runtime().ExecutableStart(context.TODO(), exec)
+status, err := client.Runtime().Exec(context.TODO(), exec)
 if err != nil {
     panic(err)
 }

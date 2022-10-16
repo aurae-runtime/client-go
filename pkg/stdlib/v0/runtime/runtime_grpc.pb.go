@@ -18,12 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RuntimeClient interface {
-	ExecutableStart(ctx context.Context, in *Executable, opts ...grpc.CallOption) (*ExecutableStatus, error)
-	ExecutableStop(ctx context.Context, in *Executable, opts ...grpc.CallOption) (*ExecutableStatus, error)
-	ContainerStart(ctx context.Context, in *Container, opts ...grpc.CallOption) (*ContainerStatus, error)
-	ContainerStop(ctx context.Context, in *Container, opts ...grpc.CallOption) (*ContainerStatus, error)
-	InstanceStart(ctx context.Context, in *Instance, opts ...grpc.CallOption) (*InstanceStatus, error)
-	InstanceStop(ctx context.Context, in *Instance, opts ...grpc.CallOption) (*InstanceStatus, error)
+	Exec(ctx context.Context, in *Executable, opts ...grpc.CallOption) (*ExecutableStatus, error)
 }
 
 type runtimeClient struct {
@@ -34,54 +29,9 @@ func NewRuntimeClient(cc grpc.ClientConnInterface) RuntimeClient {
 	return &runtimeClient{cc}
 }
 
-func (c *runtimeClient) ExecutableStart(ctx context.Context, in *Executable, opts ...grpc.CallOption) (*ExecutableStatus, error) {
+func (c *runtimeClient) Exec(ctx context.Context, in *Executable, opts ...grpc.CallOption) (*ExecutableStatus, error) {
 	out := new(ExecutableStatus)
-	err := c.cc.Invoke(ctx, "/runtime.Runtime/ExecutableStart", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *runtimeClient) ExecutableStop(ctx context.Context, in *Executable, opts ...grpc.CallOption) (*ExecutableStatus, error) {
-	out := new(ExecutableStatus)
-	err := c.cc.Invoke(ctx, "/runtime.Runtime/ExecutableStop", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *runtimeClient) ContainerStart(ctx context.Context, in *Container, opts ...grpc.CallOption) (*ContainerStatus, error) {
-	out := new(ContainerStatus)
-	err := c.cc.Invoke(ctx, "/runtime.Runtime/ContainerStart", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *runtimeClient) ContainerStop(ctx context.Context, in *Container, opts ...grpc.CallOption) (*ContainerStatus, error) {
-	out := new(ContainerStatus)
-	err := c.cc.Invoke(ctx, "/runtime.Runtime/ContainerStop", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *runtimeClient) InstanceStart(ctx context.Context, in *Instance, opts ...grpc.CallOption) (*InstanceStatus, error) {
-	out := new(InstanceStatus)
-	err := c.cc.Invoke(ctx, "/runtime.Runtime/InstanceStart", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *runtimeClient) InstanceStop(ctx context.Context, in *Instance, opts ...grpc.CallOption) (*InstanceStatus, error) {
-	out := new(InstanceStatus)
-	err := c.cc.Invoke(ctx, "/runtime.Runtime/InstanceStop", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/runtime.Runtime/Exec", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,12 +42,7 @@ func (c *runtimeClient) InstanceStop(ctx context.Context, in *Instance, opts ...
 // All implementations must embed UnimplementedRuntimeServer
 // for forward compatibility
 type RuntimeServer interface {
-	ExecutableStart(context.Context, *Executable) (*ExecutableStatus, error)
-	ExecutableStop(context.Context, *Executable) (*ExecutableStatus, error)
-	ContainerStart(context.Context, *Container) (*ContainerStatus, error)
-	ContainerStop(context.Context, *Container) (*ContainerStatus, error)
-	InstanceStart(context.Context, *Instance) (*InstanceStatus, error)
-	InstanceStop(context.Context, *Instance) (*InstanceStatus, error)
+	Exec(context.Context, *Executable) (*ExecutableStatus, error)
 	mustEmbedUnimplementedRuntimeServer()
 }
 
@@ -105,23 +50,8 @@ type RuntimeServer interface {
 type UnimplementedRuntimeServer struct {
 }
 
-func (UnimplementedRuntimeServer) ExecutableStart(context.Context, *Executable) (*ExecutableStatus, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ExecutableStart not implemented")
-}
-func (UnimplementedRuntimeServer) ExecutableStop(context.Context, *Executable) (*ExecutableStatus, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ExecutableStop not implemented")
-}
-func (UnimplementedRuntimeServer) ContainerStart(context.Context, *Container) (*ContainerStatus, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ContainerStart not implemented")
-}
-func (UnimplementedRuntimeServer) ContainerStop(context.Context, *Container) (*ContainerStatus, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ContainerStop not implemented")
-}
-func (UnimplementedRuntimeServer) InstanceStart(context.Context, *Instance) (*InstanceStatus, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method InstanceStart not implemented")
-}
-func (UnimplementedRuntimeServer) InstanceStop(context.Context, *Instance) (*InstanceStatus, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method InstanceStop not implemented")
+func (UnimplementedRuntimeServer) Exec(context.Context, *Executable) (*ExecutableStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Exec not implemented")
 }
 func (UnimplementedRuntimeServer) mustEmbedUnimplementedRuntimeServer() {}
 
@@ -136,110 +66,20 @@ func RegisterRuntimeServer(s grpc.ServiceRegistrar, srv RuntimeServer) {
 	s.RegisterService(&Runtime_ServiceDesc, srv)
 }
 
-func _Runtime_ExecutableStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Runtime_Exec_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Executable)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RuntimeServer).ExecutableStart(ctx, in)
+		return srv.(RuntimeServer).Exec(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/runtime.Runtime/ExecutableStart",
+		FullMethod: "/runtime.Runtime/Exec",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RuntimeServer).ExecutableStart(ctx, req.(*Executable))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Runtime_ExecutableStop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Executable)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RuntimeServer).ExecutableStop(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/runtime.Runtime/ExecutableStop",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RuntimeServer).ExecutableStop(ctx, req.(*Executable))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Runtime_ContainerStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Container)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RuntimeServer).ContainerStart(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/runtime.Runtime/ContainerStart",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RuntimeServer).ContainerStart(ctx, req.(*Container))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Runtime_ContainerStop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Container)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RuntimeServer).ContainerStop(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/runtime.Runtime/ContainerStop",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RuntimeServer).ContainerStop(ctx, req.(*Container))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Runtime_InstanceStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Instance)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RuntimeServer).InstanceStart(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/runtime.Runtime/InstanceStart",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RuntimeServer).InstanceStart(ctx, req.(*Instance))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Runtime_InstanceStop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Instance)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(RuntimeServer).InstanceStop(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/runtime.Runtime/InstanceStop",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RuntimeServer).InstanceStop(ctx, req.(*Instance))
+		return srv.(RuntimeServer).Exec(ctx, req.(*Executable))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -252,28 +92,8 @@ var Runtime_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*RuntimeServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ExecutableStart",
-			Handler:    _Runtime_ExecutableStart_Handler,
-		},
-		{
-			MethodName: "ExecutableStop",
-			Handler:    _Runtime_ExecutableStop_Handler,
-		},
-		{
-			MethodName: "ContainerStart",
-			Handler:    _Runtime_ContainerStart_Handler,
-		},
-		{
-			MethodName: "ContainerStop",
-			Handler:    _Runtime_ContainerStop_Handler,
-		},
-		{
-			MethodName: "InstanceStart",
-			Handler:    _Runtime_InstanceStart_Handler,
-		},
-		{
-			MethodName: "InstanceStop",
-			Handler:    _Runtime_InstanceStop_Handler,
+			MethodName: "Exec",
+			Handler:    _Runtime_Exec_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

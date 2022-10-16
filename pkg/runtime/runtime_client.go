@@ -16,26 +16,6 @@ func NewRuntimeClient(conn *grpc.ClientConn) Client {
 	}
 }
 
-func (rc Client) ExecutableStart(ctx context.Context, in *runtime.Executable) (*runtime.ExecutableStatus, error) {
-	return rc.grpc.ExecutableStart(ctx, in)
-}
-
-func (rc Client) ExecutableStop(ctx context.Context, in *runtime.Executable) (*runtime.ExecutableStatus, error) {
-	return rc.grpc.ExecutableStop(ctx, in)
-}
-
-func (rc Client) ContainerStart(ctx context.Context, in *runtime.Container) (*runtime.ContainerStatus, error) {
-	return rc.grpc.ContainerStart(ctx, in)
-}
-
-func (rc Client) ContainerStop(ctx context.Context, in *runtime.Container) (*runtime.ContainerStatus, error) {
-	return rc.grpc.ContainerStop(ctx, in)
-}
-
-func (rc Client) InstanceStart(ctx context.Context, in *runtime.Instance) (*runtime.InstanceStatus, error) {
-	return rc.grpc.InstanceStart(ctx, in)
-}
-
-func (rc Client) InstanceStop(ctx context.Context, in *runtime.Instance) (*runtime.InstanceStatus, error) {
-	return rc.grpc.InstanceStop(ctx, in)
+func (rc Client) Exec(ctx context.Context, in *runtime.Executable) (*runtime.ExecutableStatus, error) {
+	return rc.grpc.Exec(ctx, in)
 }

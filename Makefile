@@ -5,7 +5,7 @@ all: generate
 generate: generate-go generate-go-grpc
 
 generate-go:
-	@for API_VERSION in $$(ls ./auraed/stdlib | grep -v ".md"); do \
+	@for API_VERSION in $$(ls ./auraed/stdlib | grep ".proto"); do \
   		for PROTO_FILE in $$(ls "./auraed/stdlib/$${API_VERSION}"); do \
   			protoc \
             		-I"./auraed/stdlib/$${API_VERSION}" \
@@ -16,7 +16,7 @@ generate-go:
   	done
 
 generate-go-grpc:
-	@for API_VERSION in $$(ls ./auraed/stdlib | grep -v ".md"); do \
+	@for API_VERSION in $$(ls ./auraed/stdlib | grep ".proto"); do \
   		for PROTO_FILE in $$(ls "./auraed/stdlib/$${API_VERSION}"); do \
   			protoc \
             		-I"./auraed/stdlib/$${API_VERSION}" \
