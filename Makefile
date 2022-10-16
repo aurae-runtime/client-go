@@ -1,6 +1,9 @@
 default: all
 
-all: generate
+all: generate build
+
+build:
+	@go build ./...
 
 generate: generate-go generate-go-grpc
 
