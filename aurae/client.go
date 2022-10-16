@@ -3,6 +3,7 @@ package aurae
 import (
 	"github.com/aurae-runtime/client-go/pkg/observe"
 	"github.com/aurae-runtime/client-go/pkg/runtime"
+	"github.com/aurae-runtime/client-go/pkg/stdlib/v0/schedule"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -23,9 +24,17 @@ func NewAuraeClient(addr string, credentials credentials.TransportCredentials) (
 }
 
 func (c *Client) Observe() observe.Client {
-	return c.Observe()
+	return observe.NewObserveClient(c.conn)
 }
 
 func (c *Client) Runtime() runtime.Client {
-	return c.Runtime()
+	return runtime.NewRuntimeClient(c.conn)
+}
+
+func (c *Client) Schedule() schedule.ScheduleClient {
+	return schedule.NewScheduleClient(c.conn)
+}
+
+func (c *Client) ScheduleExecutable() schedule.ScheduleExecutableClient {
+	return schedule.NewScheduleExecutableClient(c.conn)
 }
