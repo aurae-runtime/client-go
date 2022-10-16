@@ -1,4 +1,4 @@
-package pkg
+package client_go
 
 import (
 	"github.com/aurae-runtime/client-go/pkg/api/v0/schedule"
