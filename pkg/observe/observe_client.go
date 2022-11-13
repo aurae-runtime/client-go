@@ -16,6 +16,14 @@ func NewObserveClient(conn *grpc.ClientConn) Client {
 	}
 }
 
+func (oc Client) GetAuraeDaemonLogStream(ctx context.Context, in *observe.GetAuraeDaemonLogStreamRequest) (observe.Observe_GetAuraeDaemonLogStreamClient, error) {
+	return oc.grpc.GetAuraeDaemonLogStream(ctx, in)
+}
+
+func (oc Client) GetSubProcessStream(ctx context.Context, in *observe.GetSubProcessStreamRequest) (observe.Observe_GetSubProcessStreamClient, error) {
+	return oc.grpc.GetSubProcessStream(ctx, in)
+}
+
 func (oc Client) Status(ctx context.Context, in *observe.StatusRequest) (*observe.StatusResponse, error) {
 	return oc.grpc.Status(ctx, in)
 }

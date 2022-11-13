@@ -19,6 +19,10 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ObserveClient interface {
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	// request log stream for aurae. everything logged via log macros in aurae (info!, error!, trace!, ... ).
+	GetAuraeDaemonLogStream(ctx context.Context, in *GetAuraeDaemonLogStreamRequest, opts ...grpc.CallOption) (Observe_GetAuraeDaemonLogStreamClient, error)
+	// TODO: request log stream for a sub process
+	GetSubProcessStream(ctx context.Context, in *GetSubProcessStreamRequest, opts ...grpc.CallOption) (Observe_GetSubProcessStreamClient, error)
 }
 
 type observeClient struct {
@@ -38,11 +42,79 @@ func (c *observeClient) Status(ctx context.Context, in *StatusRequest, opts ...g
 	return out, nil
 }
 
+func (c *observeClient) GetAuraeDaemonLogStream(ctx context.Context, in *GetAuraeDaemonLogStreamRequest, opts ...grpc.CallOption) (Observe_GetAuraeDaemonLogStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Observe_ServiceDesc.Streams[0], "/observe.Observe/GetAuraeDaemonLogStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &observeGetAuraeDaemonLogStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Observe_GetAuraeDaemonLogStreamClient interface {
+	Recv() (*LogItem, error)
+	grpc.ClientStream
+}
+
+type observeGetAuraeDaemonLogStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *observeGetAuraeDaemonLogStreamClient) Recv() (*LogItem, error) {
+	m := new(LogItem)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *observeClient) GetSubProcessStream(ctx context.Context, in *GetSubProcessStreamRequest, opts ...grpc.CallOption) (Observe_GetSubProcessStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Observe_ServiceDesc.Streams[1], "/observe.Observe/GetSubProcessStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &observeGetSubProcessStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Observe_GetSubProcessStreamClient interface {
+	Recv() (*LogItem, error)
+	grpc.ClientStream
+}
+
+type observeGetSubProcessStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *observeGetSubProcessStreamClient) Recv() (*LogItem, error) {
+	m := new(LogItem)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ObserveServer is the server API for Observe service.
 // All implementations must embed UnimplementedObserveServer
 // for forward compatibility
 type ObserveServer interface {
 	Status(context.Context, *StatusRequest) (*StatusResponse, error)
+	// request log stream for aurae. everything logged via log macros in aurae (info!, error!, trace!, ... ).
+	GetAuraeDaemonLogStream(*GetAuraeDaemonLogStreamRequest, Observe_GetAuraeDaemonLogStreamServer) error
+	// TODO: request log stream for a sub process
+	GetSubProcessStream(*GetSubProcessStreamRequest, Observe_GetSubProcessStreamServer) error
 	mustEmbedUnimplementedObserveServer()
 }
 
@@ -52,6 +124,12 @@ type UnimplementedObserveServer struct {
 
 func (UnimplementedObserveServer) Status(context.Context, *StatusRequest) (*StatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
+}
+func (UnimplementedObserveServer) GetAuraeDaemonLogStream(*GetAuraeDaemonLogStreamRequest, Observe_GetAuraeDaemonLogStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAuraeDaemonLogStream not implemented")
+}
+func (UnimplementedObserveServer) GetSubProcessStream(*GetSubProcessStreamRequest, Observe_GetSubProcessStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetSubProcessStream not implemented")
 }
 func (UnimplementedObserveServer) mustEmbedUnimplementedObserveServer() {}
 
@@ -84,6 +162,48 @@ func _Observe_Status_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Observe_GetAuraeDaemonLogStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetAuraeDaemonLogStreamRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ObserveServer).GetAuraeDaemonLogStream(m, &observeGetAuraeDaemonLogStreamServer{stream})
+}
+
+type Observe_GetAuraeDaemonLogStreamServer interface {
+	Send(*LogItem) error
+	grpc.ServerStream
+}
+
+type observeGetAuraeDaemonLogStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *observeGetAuraeDaemonLogStreamServer) Send(m *LogItem) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Observe_GetSubProcessStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetSubProcessStreamRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ObserveServer).GetSubProcessStream(m, &observeGetSubProcessStreamServer{stream})
+}
+
+type Observe_GetSubProcessStreamServer interface {
+	Send(*LogItem) error
+	grpc.ServerStream
+}
+
+type observeGetSubProcessStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *observeGetSubProcessStreamServer) Send(m *LogItem) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // Observe_ServiceDesc is the grpc.ServiceDesc for Observe service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -96,6 +216,17 @@ var Observe_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Observe_Status_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAuraeDaemonLogStream",
+			Handler:       _Observe_GetAuraeDaemonLogStream_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "GetSubProcessStream",
+			Handler:       _Observe_GetSubProcessStream_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "observe.proto",
 }
