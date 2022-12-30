@@ -1,0 +1,4 @@
+[submodule "aurae"]
+	path = aurae
+	url = https://github.com/aurae-runtime/aurae
+	branch = main
